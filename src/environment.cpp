@@ -56,6 +56,8 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
     renderPointCloud(viewer, pointCloud, name, color);
     // void renderPointCloud(pcl::visualization::PCLVisualizer::Ptr& viewer, const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud, std::string name, Color color)
     // TODO:: Create point processor
+    ProcessPointClouds<pcl::PointXYZ>* pcp = new ProcessPointClouds<pcl::PointXYZ>();
+
 
 
 
