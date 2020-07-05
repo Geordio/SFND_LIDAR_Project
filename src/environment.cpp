@@ -52,14 +52,21 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
     // Vect3(0,0,0)
     // renderRays(viewer,  Vect3(0,0,1), pointCloud);
     std::__cxx11::string name = "PointCloud";
-    Color color = Color(255,0,0);
-    renderPointCloud(viewer, pointCloud, name, color);
+    Color colorRed = Color(255,0,0);
+    Color colorGreen = Color(0,255,0);
+    renderPointCloud(viewer, pointCloud, name, colorRed);
+
     // void renderPointCloud(pcl::visualization::PCLVisualizer::Ptr& viewer, const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud, std::string name, Color color)
     // TODO:: Create point processor
-    ProcessPointClouds<pcl::PointXYZ>* pcp = new ProcessPointClouds<pcl::PointXYZ>();
+    // ProcessPointClouds<pcl::PointXYZ>* pointCloudProcessor = new ProcessPointClouds<pcl::PointXYZ>();
 
 
+    ProcessPointClouds<pcl::PointXYZ> pointCloudProcessor;
 
+    std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = pointCloudProcessor.SegmentPlane(pointCloud,100,0.2);
+
+    renderPointCloud(viewer, segmentCloud.first, "ObstacleCloud", colorRed);
+    renderPointCloud(viewer, segmentCloud.second, "PlaneCloud", colorGreen);
 
 }
 
