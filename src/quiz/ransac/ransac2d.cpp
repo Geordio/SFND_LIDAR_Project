@@ -73,17 +73,38 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 
 // Line Formula 
 // Ax + By + C = 0
-
 // (y1-y2)x + (x2-x1)y + (x1*y2 - x2*y1) = 0
 // A = y1-y2
 // B = x2-x1
 // C = (x1*y2 - x2*y1)
-
 // Point(x,y)
 // Distance d = abs(Ax + By + C) / sqrt((pow(A,2) + (pow(B,2) ))
-// calculate the line coefficients
 
+
+// calculate the line coefficients
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered;
+
+
+//----------------------------------------------------------------
+// Equation of a Plane through Three Points
+// Ax+By+Cz+D=0
+// point1=(x1,y1,z1)
+// point2=(x2,y2,z2)
+// point3=(x3,y3,z3)
+
+// Use point1 as a reference and define two vectors on the plane v1 and v2 as follows:
+
+//     Vector v1 travels from point1 to point2.
+//     Vector v2 travels from point1 to point3
+
+// model plane using 2 vectors, from point 1 to 2, and point 1 to 3
+// v1=<x2−x1,y2−y1,z2−z1> 
+// v2=<x3−x1,y3−y1,z3−z1>
+
+// d=∣A∗x+B∗y+C∗z+D∣/sqrt(pow(A,2)+pow(B,2) +pow(C,2)).
+
+// generate 3 random numbers to pick points from the cloud.
+//-----------------------------------------------------------------
 
 	int pointCloudSize = cloud->points.size();
 
@@ -99,7 +120,14 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 		int sampleIndex1 = rand() % pointCloudSize; 
 		int sampleIndex2 = rand() % pointCloudSize; 
 		while (sampleIndex1 == sampleIndex2)
-			sampleIndex2 = rand() % pointCloudSize; 
+			sampleIndex2 = rand() % pointCloudSize;
+
+// generate a 3rd point for the plane representation
+		int sampleIndex3 = rand() % pointCloudSize; 		
+
+		while ((sampleIndex1 == sampleIndex3) || (sampleIndex2 == sampleIndex3))
+			sampleIndex3 = rand() % pointCloudSize; 
+ 
 
 		samples.insert(samples.begin(),sampleIndex1);
 		// samples2.insert(sampleIndex1);
@@ -108,13 +136,39 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 
 		float x1 = cloud->points[sampleIndex1].x;
 		float y1 = cloud->points[sampleIndex1].y;
+		float z1 = cloud->points[sampleIndex1].z;
 			
 		float x2 = cloud->points[sampleIndex2].x;
 		float y2 = cloud->points[sampleIndex2].y;
+		float z2 = cloud->points[sampleIndex2].z;
+
+		float x3 = cloud->points[sampleIndex3].x;
+		float y3 = cloud->points[sampleIndex3].y;
+		float z3 = cloud->points[sampleIndex3].z;
 
 		float A = y1-y2;
 		float B = x2-x1;
 		float C = (x1*y2 - x2*y1);
+
+	
+
+
+		A = (y2 - y1) * (z3 - z1) - (z2 - z1)*(y3 - y1);
+		B = (z2 - z1) * (x3 - x1) - (x2 - x1)*(z3 - z1);
+		C = (x2 - x1) * (y3 - y1) - (y2 - y1)*(x3 - x1);
+	 float D = -(A * x1+ B * y1+C *z1);
+
+// TODO: would be better to define v1 and v2 using points. ie  v1 = p2 - p1; v2 = p3-p1
+// the resulitng vector form the couple of steps would be v1×v2=<i,j,k>. can then access th eappropriate element
+// the above is the long winded way
+
+
+
+
+// this dont work but left for ref. THESE DO WORK NOW. ISSUE WITH WRONG MINUS SIGN!!!!
+		// std::vector<float> v1{1,2,3};
+		// std::vector<float> v1{(x2 - x1),(y2 - y1),(z2 - z1)};
+		// std::vector<float> v1{x2 - x1,y2 - y1, z2 - z1};
 
 		cout << "A: " << A << " ,B: " << B << ", C: " << C << endl;		
 
@@ -125,8 +179,11 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 
 				float x = cloud->points[j].x;
 				float y = cloud->points[j].y;
+				float z = cloud->points[j].z;
 
-				float d = abs(A*x + B*y + C) / sqrt((pow(A,2) + (pow(B,2) )));
+// first line is for a line.... second is a plane
+				// float d = abs(A*x + B*y + C) / sqrt((pow(A,2) + (pow(B,2) )));
+				float d = abs(A*x + B*y +C*z  + D)/sqrt(pow(A,2) + pow(B,2) +pow(C,2));
 
 				cout << "index:\t"<< j <<"\t, distance:\t" << d << endl;
 				// check if the distance is smaller than the passed tolerance
@@ -163,8 +220,9 @@ int main ()
 	// Create viewer
 	pcl::visualization::PCLVisualizer::Ptr viewer = initScene();
 
-	// Create data
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = CreateData();
+	// Create data 
+	// NOTE CreateData3D for plane implementation, CreateData fr Line
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = CreateData3D();
 	
 
 	// TODO: Change the max iteration and distance tolerance arguments for Ransac function
