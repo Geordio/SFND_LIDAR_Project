@@ -106,6 +106,11 @@ int main ()
 
 	KdTree* tree = new KdTree;
   
+    	// tree->insert(points[0],0); 
+
+    // for (int i=0; i<2; i++) 
+    // 	tree->insert(points[i],i); 
+
     for (int i=0; i<points.size(); i++) 
     	tree->insert(points[i],i); 
 
@@ -113,9 +118,13 @@ int main ()
   	render2DTree(tree->root,viewer,window, it);
   
   	std::cout << "Test Search" << std::endl;
+
+
   	std::vector<int> nearby = tree->search({-6,7},3.0);
+
+	cout << "search result: " << nearby.size() << endl;
   	for(int index : nearby)
-      std::cout << index << ",";
+    	std::cout << index << ",";
   	std::cout << std::endl;
 
   	// Time segmentation process

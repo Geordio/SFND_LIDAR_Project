@@ -185,7 +185,7 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 				// float d = abs(A*x + B*y + C) / sqrt((pow(A,2) + (pow(B,2) )));
 				float d = abs(A*x + B*y +C*z  + D)/sqrt(pow(A,2) + pow(B,2) +pow(C,2));
 
-				cout << "index:\t"<< j <<"\t, distance:\t" << d << endl;
+				// cout << "index:\t"<< j <<"\t, distance:\t" << d << endl;
 				// check if the distance is smaller than the passed tolerance
 				if (d < distanceTol) {
 					inliers.insert(j);	
@@ -226,7 +226,7 @@ int main ()
 	
 
 	// TODO: Change the max iteration and distance tolerance arguments for Ransac function
-	std::unordered_set<int> inliers = Ransac(cloud, 50, 0.5);
+	std::unordered_set<int> inliers = Ransac(cloud, 50, 0.25);
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr  cloudInliers(new pcl::PointCloud<pcl::PointXYZ>());
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOutliers(new pcl::PointCloud<pcl::PointXYZ>());
