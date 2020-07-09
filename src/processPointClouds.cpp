@@ -27,13 +27,60 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
     // Time segmentation process
     auto startTime = std::chrono::steady_clock::now();
 
+    typename pcl::PointCloud<PointT>::Ptr filterCloud(new pcl::PointCloud<PointT>);
+
+    // typename pcl::PointCloud<PointT>::Ptr filterCloud;
     // TODO:: Fill in the function to do voxel grid point reduction and region based filtering
+      // Create the filtering object
+    pcl::VoxelGrid<PointT> sor;
+    sor.setInputCloud (cloud);
+    sor.setLeafSize (filterRes, filterRes, filterRes);
+    sor.filter (*filterCloud);
+    // sor.filter (*cloud_filtered);
+
+
+    // typename pcl::PointCloud<PointT>::Ptr regionCloud(new pcl::PointCloud<PointT>);
+    pcl::CropBox<PointT> cropBox(true);
+    // pcl::CropBox<PointT>* cropBox = new pcl::CropBox<PointT> (false);
+
+    cropBox.setInputCloud(filterCloud); 
+    cropBox.setMax(maxPoint);
+    cropBox.setMin(minPoint);
+    cropBox.filter(*filterCloud);
+
+
+  // crop the roof out, from the lesson solution
+    std::vector<int> indices;
+    pcl::CropBox<PointT> cropRoof(true);
+    // pcl::CropBox<PointT>* cropBox = new pcl::CropBox<PointT> (false);
+
+    cropBox.setInputCloud(filterCloud); 
+    cropBox.setMin(Eigen::Vector4f (-1.5, -1.7, -1, 1));
+    cropBox.setMax(Eigen::Vector4f (2.6, 1.7, -0.4, 1));
+    cropBox.filter(indices);
+
+    pcl::PointIndices::Ptr inliers {new pcl::PointIndices};
+
+    //iterate through the indices retruned from the roof crop, adding to inliers
+    for (int point : indices) 
+      inliers->indices.push_back(point);
+
+// TODO: add the roof filer from the solution video
+    pcl::ExtractIndices<PointT> extract;
+    extract.setInputCloud(filterCloud);
+    extract.setIndices(inliers);
+    extract.setNegative(true);
+    extract.filter(*filterCloud);
+
+
+
+
 
     auto endTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     std::cout << "filtering took " << elapsedTime.count() << " milliseconds" << std::endl;
 
-    return cloud;
+    return filterCloud;
 
 }
 
