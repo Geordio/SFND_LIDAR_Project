@@ -286,11 +286,13 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
     // cout << "vect: " << vect[0] << "," << vect[1] << "," << vect[2] << endl;
     // points_test.push_back((cloud->points[i].x, cloud->points[i].y, cloud->points[i].z));
     points.push_back(vect);
+    tree_simple->insert(vect, i);
+    
   }
 
-  //TODO, include this in the loop above
-  for (int i = 0; i < points.size(); i++)
-    tree_simple->insert(points[i], i);
+  //TODO, include this in the loop above?
+  // for (int i = 0; i < points.size(); i++)
+  //   tree_simple->insert(points[i], i);
 
   std::vector<std::vector<int>> clusters_new;
   std::vector<bool> processed(points.size(), false);
