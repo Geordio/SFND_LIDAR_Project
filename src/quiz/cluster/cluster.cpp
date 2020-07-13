@@ -78,7 +78,7 @@ void render3DTree(Node *node, pcl::visualization::PCLVisualizer::Ptr &viewer, Bo
 		Box lowerWindow = window;
 		// split on x axis
 		if (depth % 3 == 0)
-		{									// from  						// to											// colour
+		{ // from  						// to											// colour
 			viewer->addLine(pcl::PointXYZ(node->point[0], window.y_min, window.z_min), pcl::PointXYZ(node->point[0], window.y_max, window.z_max), 0, 0, 1, "line" + std::to_string(iteration));
 			lowerWindow.x_max = node->point[0];
 			upperWindow.x_min = node->point[0];
@@ -92,7 +92,7 @@ void render3DTree(Node *node, pcl::visualization::PCLVisualizer::Ptr &viewer, Bo
 		}
 		else
 		{
-			viewer->addLine(pcl::PointXYZ(window.x_min, window.y_min , node->point[2]), pcl::PointXYZ(window.x_max,  window.y_max, node->point[2]), 0, 1, 0, "line" + std::to_string(iteration));
+			viewer->addLine(pcl::PointXYZ(window.x_min, window.y_min, node->point[2]), pcl::PointXYZ(window.x_max, window.y_max, node->point[2]), 0, 1, 0, "line" + std::to_string(iteration));
 			lowerWindow.y_max = node->point[2];
 			upperWindow.y_min = node->point[2];
 		}
@@ -131,6 +131,7 @@ std::vector<std::vector<int>> euclideanCluster(const std::vector<std::vector<flo
 
 	while (i < points.size())
 	{
+		cout << "*******: "<< i << endl;
 		if (processed[i])
 		{
 			i++;
@@ -148,7 +149,8 @@ std::vector<std::vector<int>> euclideanCluster(const std::vector<std::vector<flo
 
 int main()
 {
-	bool is3d = true;
+	bool is3d = false;
+	bool doSearch = false;
 	// Create viewer
 	Box window;
 	window.x_min = -10;
@@ -169,7 +171,7 @@ int main()
 	std::vector<std::vector<float>> points;
 	// Create data
 	if (is3d)
-		points = {{-6.2, 7, 2}, {-6.3, 8.4, 3}, {-5.2, 7.1, 2}, {-5.7, 6.3, 2.5},{7.2, 6.1, 3}, {8.0, 5.3, 4.1}, {7.2, 7.1, -1}, {0.2, -7.1, -5}, {1.7, -6.9, 2}, {-1.2, -7.2, 3}, {2.2, -8.9, 7}};
+		points = {{-6.2, 7, 2}, {-6.3, 8.4, 3}, {-5.2, 7.1, 2}, {-5.7, 6.3, 2.5}, {7.2, 6.1, 3}, {8.0, 5.3, 4.1}, {7.2, 7.1, -1}, {0.2, -7.1, -5}, {1.7, -6.9, 2}, {-1.2, -7.2, 3}, {2.2, -8.9, 7}};
 	else
 	{
 		points = {{-6.2, 7}, {-6.3, 8.4}, {-5.2, 7.1}, {-5.7, 6.3}, {7.2, 6.1}, {8.0, 5.3}, {7.2, 7.1}, {0.2, -7.1}, {1.7, -6.9}, {-1.2, -7.2}, {2.2, -8.9}};
@@ -196,19 +198,20 @@ int main()
 	{
 		render2DTree(tree->root, viewer, window, it);
 	}
-	
+
 	// viewer->addSphere(pcl::PointXYZ(-6.2, 7, 2) , 0.015 , 0.0 , 1.0 , 1.0,  "sphere1");
 
-	std::cout << "Test Search" << std::endl;
+	if (doSearch)
+	{
+		std::cout << "Test Search" << std::endl;
+		std::vector<int> nearby = tree->search({-6, 7}, 3.0);
+		// std::vector<int> nearby = tree->search({5, 7}, 5.0);
 
-	std::vector<int> nearby = tree->search({-6, 7}, 3.0);
-	// std::vector<int> nearby = tree->search({5, 7}, 5.0);
-
-	cout << "search result: " << nearby.size() << endl;
-	for (int index : nearby)
-		std::cout << index << ",";
-	std::cout << std::endl;
-
+		cout << "search result: " << nearby.size() << endl;
+		for (int index : nearby)
+			std::cout << index << ",";
+		std::cout << std::endl;
+	}
 	// Time segmentation process
 	auto startTime = std::chrono::steady_clock::now();
 	//

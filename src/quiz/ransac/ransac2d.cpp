@@ -61,6 +61,11 @@ pcl::visualization::PCLVisualizer::Ptr initScene()
   	return viewer;
 }
 
+
+/// arguments 
+/// pointer to cloud
+/// maxIterations
+/// distanceTol increase value to allow wider spaced points to be clustered
 std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int maxIterations, float distanceTol)
 {
 	std::unordered_set<int> inliersResult;
@@ -69,7 +74,7 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 	// TODO: Fill in this function
 
 	// number of samples is 2 for the line
-	int goal_samples = 2;
+	// int goal_samples = 2;
 
 // Line Formula 
 // Ax + By + C = 0
@@ -119,12 +124,15 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 	// generate 2 random numbers
 		int sampleIndex1 = rand() % pointCloudSize; 
 		int sampleIndex2 = rand() % pointCloudSize; 
+
+		// check that the generate random number is unique, and if not then create a new one until it is
 		while (sampleIndex1 == sampleIndex2)
 			sampleIndex2 = rand() % pointCloudSize;
 
 // generate a 3rd point for the plane representation
-		int sampleIndex3 = rand() % pointCloudSize; 		
+		int sampleIndex3 = rand() % pointCloudSize; 
 
+		// check that the generate random number is unique, and if not then create a new one until it is
 		while ((sampleIndex1 == sampleIndex3) || (sampleIndex2 == sampleIndex3))
 			sampleIndex3 = rand() % pointCloudSize; 
  
@@ -134,6 +142,8 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 
 		cout << "samples:\t" << sampleIndex1 << ", " << sampleIndex2 << endl;
 
+// probably better way to do this
+// define variables for x, y, z for each point and populate
 		float x1 = cloud->points[sampleIndex1].x;
 		float y1 = cloud->points[sampleIndex1].y;
 		float z1 = cloud->points[sampleIndex1].z;
@@ -150,9 +160,6 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 		float B = x2-x1;
 		float C = (x1*y2 - x2*y1);
 
-	
-
-
 		A = (y2 - y1) * (z3 - z1) - (z2 - z1)*(y3 - y1);
 		B = (z2 - z1) * (x3 - x1) - (x2 - x1)*(z3 - z1);
 		C = (x2 - x1) * (y3 - y1) - (y2 - y1)*(x3 - x1);
@@ -161,9 +168,6 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 // TODO: would be better to define v1 and v2 using points. ie  v1 = p2 - p1; v2 = p3-p1
 // the resulitng vector form the couple of steps would be v1×v2=<i,j,k>. can then access th eappropriate element
 // the above is the long winded way
-
-
-
 
 // this dont work but left for ref. THESE DO WORK NOW. ISSUE WITH WRONG MINUS SIGN!!!!
 		// std::vector<float> v1{1,2,3};
@@ -174,14 +178,14 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 
 		for (int j = 0; j < pointCloudSize; j++) {
 
-			// check to see if the index was one of the ones selected randomly
+			// check to see if the index was one of the ones selected randomly if not, then check the distance to the line / plane
 			if ((j != sampleIndex1) && (j != sampleIndex2)) {
 
 				float x = cloud->points[j].x;
 				float y = cloud->points[j].y;
 				float z = cloud->points[j].z;
 
-// first line is for a line.... second is a plane
+// first line is for a line.... second is a plane, commented out line implementation
 				// float d = abs(A*x + B*y + C) / sqrt((pow(A,2) + (pow(B,2) )));
 				float d = abs(A*x + B*y +C*z  + D)/sqrt(pow(A,2) + pow(B,2) +pow(C,2));
 
@@ -226,11 +230,13 @@ int main ()
 	
 
 	// TODO: Change the max iteration and distance tolerance arguments for Ransac function
-	std::unordered_set<int> inliers = Ransac(cloud, 50, 0.25);
+	std::unordered_set<int> inliers = Ransac(cloud, 50, 0.15);
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr  cloudInliers(new pcl::PointCloud<pcl::PointXYZ>());
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOutliers(new pcl::PointCloud<pcl::PointXYZ>());
 
+
+// from the inliers as an ordered set, generate a Pointcloud for the in liers and out liers
 	for(int index = 0; index < cloud->points.size(); index++)
 	{
 		pcl::PointXYZ point = cloud->points[index];

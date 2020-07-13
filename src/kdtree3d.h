@@ -33,7 +33,7 @@ struct KdTree_simple
 
 		insertNode(&root, 0, point, id);
 
-		cout << "------------------------------" << endl;
+		// cout << "------------------------------" << endl;
 	}
 
 	// void insert(BinaryTreeNode **node, int data)
@@ -144,7 +144,7 @@ struct KdTree_simple
 
 		if (node != NULL)
 		{
-		cout << "This Node id: " << ((node)->id) << endl;
+		// cout << "This Node id: " << ((node)->id) << endl;
 			// cout << "not null, checking if inside tolerances" << endl;
 
 			bool inTolerance = true;
@@ -180,7 +180,7 @@ struct KdTree_simple
 				// float dist_to_node = sqrt(pow(delta_x, 2) + pow(delta_y, 2));
 
 				// // cout << "debugging: " << 
-				 cout << "euclidean: " << dist_to_node << endl;
+				//  cout << "euclidean: " << dist_to_node << endl;
 
 				if (dist_to_node <= distanceTol)
 				{
