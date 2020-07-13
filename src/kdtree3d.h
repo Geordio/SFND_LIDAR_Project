@@ -36,44 +36,6 @@ struct KdTree_simple
 		// cout << "------------------------------" << endl;
 	}
 
-	// void insert(BinaryTreeNode **node, int data)
-	//    {
-	//       if(*node == NULL)
-	//       {
-	//         *node = getNewNode(data);
-	//       }
-	//       else if(data < (*node)->data)
-	//       {
-	//         insert(&(*node)->left, data);
-	//       }
-	//       else
-	//       {
-	//         insert(&(*node)->right, data);
-	//       }
-	//    }
-	// 	void insert(BinaryTreeNode *&node, int data)
-	//    {
-	//       if(node == NULL)
-	//       {
-	//         node = getNewNode(data);
-	//       }
-	//       else if(data < node->data)
-	//       {
-	//         insert(node->left, data);
-	//       }
-	//       else
-	//       {
-	//         insert(node->right, data);
-	//       }
-	//    }
-
-	// void insertNode(Node *&node, uint depth, std::vector<float> point, int id)
-	// {
-	// 	if (node == NULL)
-	// 	{
-	// 		node = new Node(point, id);
-	// 	}
-	// }
 
 	/// depth starts at 0 and increments as we progress down recursively
 	void insertNode(Node **node, uint depth, std::vector<float> point, int id)
