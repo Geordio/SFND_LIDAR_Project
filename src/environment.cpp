@@ -146,14 +146,15 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr &viewer, ProcessPointCloud
     std::vector<Color> colors = {Color(1, 0, 0), Color(0, 1, 1), Color(0, 0, 1)};
     // ProcessPointClouds<pcl::PointXYZ> pointCloudProcessor;
     int maxIterations = 50;
-    float distanceTol = 0.3; // s
+    float distanceTol = 0.5; // s
     std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = pointProcessorI->SegmentPlane(filterCloud, maxIterations, distanceTol);
 
     // renderPointCloud(viewer, segmentCloud.first, "ObstacleCloud", colorRed);
     renderPointCloud(viewer, segmentCloud.second, "PlaneCloud", Color(0, 1, 0));
 
     // run clustering on the obstacle cloud
-    std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessorI->Clustering(segmentCloud.first, 0.5, 3, 30);
+    // maxSize and minSize not used for self implemented KDtree
+    std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessorI->Clustering(segmentCloud.first,distanceTol);// 0.5);//, 3, 30);
 
     int clusterId = 0;
 

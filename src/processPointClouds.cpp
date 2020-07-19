@@ -255,8 +255,10 @@ void ProcessPointClouds<PointT>::clusterHelper(int indice, const std::vector<std
   }
 }
 
+
+/// minSize, maxSize no longer used since own implementation of KDtree, removed from signature
 template <typename PointT>
-std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::Clustering(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize)
+std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::Clustering(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance)
 {
 
   // Time clustering process
@@ -269,7 +271,6 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
   // need to replace with own KDTree implementation for project
   // TODO, expand the KDTree from the quiz to be 3d. need to cover x,y,z dimensions? i.e mod 3.
 
-  // steps?
   // create tree object
   // add points
   // cluster    	euclideanCluster method returns std::vector<std::vector<int>> clusters
